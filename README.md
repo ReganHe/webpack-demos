@@ -101,6 +101,7 @@ You could customize `scripts` field in your package.json file as following.
 1. [Vendor chunk](#demo13-vendor-chunk-source)
 1. [Exposing Global Variables](#demo14-exposing-global-variables-source)
 1. [React router](#demo15-react-router-source)
+1. [Devtool](#demo16-devtool-source)
 
 ## Demo01: Entry file ([source](https://github.com/ruanyf/webpack-demos/tree/master/demo01))
 
@@ -1061,6 +1062,54 @@ Launch the server.
 ```bash
 $ cd demo15
 $ npm run dev
+```
+
+## Demo16: Devtool ([source](https://github.com/ReganHe/webpack-demos/tree/master/demo16))
+
+Webpack has a plugin system to expand its functions. For example, [UglifyJs Plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) will minify output(`bundle.js`) JS codes.
+
+main.js
+
+```javascript
+var longVariableName = 'Hello';
+longVariableName += ' World';
+document.write('<h1>' + longVariableName + '</h1>');
+```
+
+index.html
+
+```html
+<html>
+<body>
+  <script src="bundle.js"></script>
+</body>
+</html>
+```
+
+webpack.config.js
+
+```javascript
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
+module.exports = {
+  devtool: "source-map",
+  entry: './main.js',
+  output: {
+    filename: 'bundle.js'
+  },
+  plugins: [
+    new UglifyJsPlugin({
+      sourceMap: true
+    })
+  ]
+};
+```
+
+After launching the server, `sourceMappingURL` will into following.
+
+```javascript
+!function(r){function n(e){if(t[e])return t[e].exports;var o=t[e]={i:e,l:!1,exports:{}};return r[e].call(o.exports,o,o.exports,n),o.l=!0,o.exports}var t={};n.m=r,n.c=t,n.i=function(r){return r},n.d=function(r,t,e){n.o(r,t)||Object.defineProperty(r,t,{configurable:!1,enumerable:!0,get:e})},n.n=function(r){var t=r&&r.__esModule?function(){return r.default}:function(){return r};return n.d(t,"a",t),t},n.o=function(r,n){return Object.prototype.hasOwnProperty.call(r,n)},n.p="",n(n.s=0)}([function(r,n){var t="Hello";t+=" World",document.write("<h1>"+t+"</h1>")}]);
+//# sourceMappingURL=bundle.js.map
 ```
 
 ## Useful links
