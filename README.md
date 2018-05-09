@@ -1114,7 +1114,8 @@ After launching the server, `sourceMappingURL` will into following.
 ```
 
 ## Demo17: Manifest-Chunk ([source](https://github.com/ReganHe/webpack-demos/tree/master/demo17))
-Webpack has a plugin system to expand its functions. For example, [UglifyJs Plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) will minify output(`bundle.js`) JS codes.
+The CommonsChunkPlugin with options 'minChunks: Infinity' will extract the wepack runtime.
+and the ManifestPlugin will create a json with the outputed files except itself.
 
 main.js
 
@@ -1139,6 +1140,7 @@ webpack.config.js
 ```javascript
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 const path = require('path');
 
 module.exports = {
@@ -1153,7 +1155,11 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'manifest', // extracted manifest
       minChunks: Infinity
-    })
+    }),
+    new ManifestPlugin({
+      fileName: 'webpack-assets.json',
+      publicPath: '/resecm/trade/mc/v2/'
+    }),
   ]
 };
 ```
@@ -1161,19 +1167,25 @@ module.exports = {
 After launching the server, these files will be outputed.
 
 ```log
-                           Asset      Size  Chunks             Chunk Names
-  bundle-c6b3014927f54e66e197.js  98 bytes       0  [emitted]  bundle
-manifest-fa0a3dc12aa3865b3b98.js   1.42 kB       1  [emitted]  manifest
-
+                           Asset       Size  Chunks             Chunk Names
+  bundle-c6b3014927f54e66e197.js   98 bytes       0  [emitted]  bundle
+manifest-fa0a3dc12aa3865b3b98.js    1.42 kB       1  [emitted]  manifest
+             webpack-assets.json  144 bytes          [emitted]
 ```
-The content of bundle-c6b3014927f54e66e197.js will be as below:
+The content of bundle-c6b3014927f54e66e197.js will be as below.
 ```javascript
 webpackJsonp([0], [function(o, e) {
   var n = "Hello";
   n += " World", document.write("<h1>" + n + "</h1>")
 }], [0]);
 ```
-
+The content of webpack-assets.json will be as below:
+```json
+{
+  "bundle.js": "/resecm/trade/mc/v2/bundle-c6b3014927f54e66e197.js",
+  "manifest.js": "/resecm/trade/mc/v2/manifest-fa0a3dc12aa3865b3b98.js"
+}
+```
 ## Useful links
 
 - [Webpack docs](https://webpack.js.org/concepts/)

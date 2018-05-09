@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 const path = require('path');
 
 module.exports = {
@@ -14,6 +15,10 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'manifest', // extracted manifest
       minChunks: Infinity
-    })
+    }),
+    new ManifestPlugin({
+      fileName: 'webpack-assets.json',
+      publicPath: '/resecm/trade/mc/v2/'
+    }),
   ]
 };
