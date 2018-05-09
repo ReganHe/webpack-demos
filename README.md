@@ -101,7 +101,8 @@ You could customize `scripts` field in your package.json file as following.
 1. [Vendor chunk](#demo13-vendor-chunk-source)
 1. [Exposing Global Variables](#demo14-exposing-global-variables-source)
 1. [React router](#demo15-react-router-source)
-1. [Devtool](#demo16-devtool-source)
+1. [SourceMap](#demo16-sourcemap-source)
+1. [Manifest](#demo17-manifest-chunk-source)
 
 ## Demo01: Entry file ([source](https://github.com/ruanyf/webpack-demos/tree/master/demo01))
 
@@ -1064,7 +1065,7 @@ $ cd demo15
 $ npm run dev
 ```
 
-## Demo16: Devtool ([source](https://github.com/ReganHe/webpack-demos/tree/master/demo16))
+## Demo16: SourceMap ([source](https://github.com/ReganHe/webpack-demos/tree/master/demo16))
 
 Webpack has a plugin system to expand its functions. For example, [UglifyJs Plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) will minify output(`bundle.js`) JS codes.
 
@@ -1110,6 +1111,67 @@ After launching the server, `sourceMappingURL` will into following.
 ```javascript
 !function(r){function n(e){if(t[e])return t[e].exports;var o=t[e]={i:e,l:!1,exports:{}};return r[e].call(o.exports,o,o.exports,n),o.l=!0,o.exports}var t={};n.m=r,n.c=t,n.i=function(r){return r},n.d=function(r,t,e){n.o(r,t)||Object.defineProperty(r,t,{configurable:!1,enumerable:!0,get:e})},n.n=function(r){var t=r&&r.__esModule?function(){return r.default}:function(){return r};return n.d(t,"a",t),t},n.o=function(r,n){return Object.prototype.hasOwnProperty.call(r,n)},n.p="",n(n.s=0)}([function(r,n){var t="Hello";t+=" World",document.write("<h1>"+t+"</h1>")}]);
 //# sourceMappingURL=bundle.js.map
+```
+
+## Demo17: Manifest-Chunk ([source](https://github.com/ReganHe/webpack-demos/tree/master/demo17))
+Webpack has a plugin system to expand its functions. For example, [UglifyJs Plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) will minify output(`bundle.js`) JS codes.
+
+main.js
+
+```javascript
+var longVariableName = 'Hello';
+longVariableName += ' World';
+document.write('<h1>' + longVariableName + '</h1>');
+```
+
+index.html
+
+```html
+<html>
+<body>
+  <script src="bundle.js"></script>
+</body>
+</html>
+```
+
+webpack.config.js
+
+```javascript
+const webpack = require('webpack');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const path = require('path');
+
+module.exports = {
+  entry: { bundle: './main.js' },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name]-[chunkhash].js'
+  },
+  plugins: [
+    new CleanWebpackPlugin('dist'),
+    // 抽取webpack runtime
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest', // extracted manifest
+      minChunks: Infinity
+    })
+  ]
+};
+```
+
+After launching the server, these files will be outputed.
+
+```log
+                           Asset      Size  Chunks             Chunk Names
+  bundle-c6b3014927f54e66e197.js  98 bytes       0  [emitted]  bundle
+manifest-fa0a3dc12aa3865b3b98.js   1.42 kB       1  [emitted]  manifest
+
+```
+The content of bundle-c6b3014927f54e66e197.js will be as below:
+```javascript
+webpackJsonp([0], [function(o, e) {
+  var n = "Hello";
+  n += " World", document.write("<h1>" + n + "</h1>")
+}], [0]);
 ```
 
 ## Useful links
